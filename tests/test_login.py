@@ -2,6 +2,7 @@ from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
 from pathlib import Path
 import os
+from pages.login_page import LoginPage
 
 
 def test_hudl_login_page():
@@ -14,14 +15,38 @@ def test_hudl_login_page():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         page = browser.new_page()
+        login_page = LoginPage(page)
         
-        page.goto("https://www.hudl.com/login")
+        login_page.navigate()
         
-        page.locator('[data-qa-id="email-input"] input').fill(email)
-        page.locator('button[type="submit"]').click()
-        
-        page.locator('[data-qa-id="password-input"] input').fill(password)
-        page.locator('button[type="submit"]').click()
+        login_page.login(email, password)
 
         page.locator("text=library").wait_for()
-        assert page.locator("text=Library").is_visible()
+        assert login_page.is_library_visible()
+        browser.close()
+
+def test_invalid_login():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+        page = browser.new_page()
+        login_page = LoginPage(page)
+
+        login_page.navigate()
+        login_page.login("invalid@email.com", "invalid1234")
+
+        assert login_page.is_error_message_visible()
+        browser.close()
+
+def test_empty_password():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+
+        page = browser.new_page()
+        login_page = LoginPage(page)
+
+        login_page.navigate()
+
+        login_page.login("test@email.com", "")
+
+        assert page.locator("text=Please enter your password").is_visible()
+        browser.close()
