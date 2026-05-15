@@ -8,6 +8,7 @@ This project demonstrates an automated test framework built using Playwright wit
 - Playwright
 - Pytest
 - python-dotenv
+- black
 
 ## Framework Structure
 
