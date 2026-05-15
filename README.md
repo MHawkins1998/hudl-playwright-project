@@ -56,7 +56,7 @@ pip install playwright pytest python-dotenv
 
 ```bash
 playwright install
-``` 
+```
 
 ## Environment Variables
 
